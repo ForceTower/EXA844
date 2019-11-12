@@ -13,7 +13,7 @@ const load = async () => {
     return {
         statusCode: 200,
         body: JSON.stringify({
-            message: 'Contents Saved to Dynamo'
+            message: 'Contents saved to Dynamo'
         }),
     };
 };
