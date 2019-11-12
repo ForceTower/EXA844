@@ -1,0 +1,59 @@
+service:
+  name: activity-three
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  apiGateway:
+    minimumCompressionSize: 1024
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 'arn:aws:dynamodb:us-east-1:502064861573:table/contacts-table'
+
+functions:
+  load:
+    handler: handler.load
+    events:
+      - http:
+          method: get
+          path: load
+  query:
+    handler: handler.query
+    events:
+      - http:
+          method: get
+          path: query
+
+
+resources:
+  Resources:
+    serviceTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: contacts-table
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
